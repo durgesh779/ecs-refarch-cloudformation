@@ -14,9 +14,7 @@ version ?= latest
 
 binary:
 	$(call blue, "Building Linux binary ready for containerisation...")
-	docker run --rm -v "${GOPATH}":/gopath -v "$(CURDIR)":/app -e "GOPATH=/gopath" -w /app golang:1.7 sh -c 'CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags="-s" -o app'
-
-image: binary
+	docker run --rm -v "$(CURDIR)":/app -w /app golang:1.21 sh -c 'CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags="-s" -o app'
 	$(call blue, "Building docker image...")
 	docker build -t ${name}:${version} .
 	$(MAKE) clean
