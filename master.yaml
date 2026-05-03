@@ -14,11 +14,20 @@ Description: >
   Last Modified: 22nd September 2016
   Author: Paul Maddox <pmaddox@amazon.com>
 
+Parameters:
+  TemplateBucket:
+    Type: String
+    Description: S3 Bucket where CloudFormation templates are stored
+
+  ImageUrl:
+    Type: String
+    Description: The full ECR image URI provided by the CI/CD pipeline
+
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/infrastructure/vpc.yaml
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/infrastructure/vpc.yaml"
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         VpcCIDR: 10.180.0.0/16
@@ -30,7 +39,7 @@ Resources:
   SecurityGroups:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/infrastructure/security-groups.yaml
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/infrastructure/security-groups.yaml"
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         VPC: !GetAtt VPC.Outputs.VPC
@@ -38,7 +47,7 @@ Resources:
   ALB:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/infrastructure/load-balancers.yaml
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/infrastructure/load-balancers.yaml"
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         VPC: !GetAtt VPC.Outputs.VPC
@@ -48,7 +57,7 @@ Resources:
   ECS:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/infrastructure/ecs-cluster.yaml
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/infrastructure/ecs-cluster.yaml"
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         InstanceType: t2.large
@@ -60,18 +69,19 @@ Resources:
   ProductService:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/services/product-service/service.yaml
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/services/product-service/service.yaml"
       Parameters:
         VPC: !GetAtt VPC.Outputs.VPC
         Cluster: !GetAtt ECS.Outputs.Cluster
         DesiredCount: 2
         Listener: !GetAtt ALB.Outputs.Listener
         Path: /products
+        ImageUrl: !Ref ImageUrl
 
   WebsiteService:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/services/website-service/service.yaml
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/services/website-service/service.yaml"
       Parameters:
         VPC: !GetAtt VPC.Outputs.VPC
         Cluster: !GetAtt ECS.Outputs.Cluster
@@ -81,11 +91,12 @@ Resources:
         Listener: !GetAtt ALB.Outputs.Listener
         Path: /
         ECSServiceAutoScalingRoleARN: !GetAtt ECS.Outputs.ECSServiceAutoScalingRole
+        ImageUrl: !Ref ImageUrl
 
   LifecycleHook:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/infrastructure/lifecyclehook.yaml
+      TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/infrastructure/lifecyclehook.yaml"
       Parameters:
         Cluster: !GetAtt ECS.Outputs.Cluster
         ECSAutoScalingGroupName: !GetAtt ECS.Outputs.ECSAutoScalingGroupName

@@ -24,6 +24,10 @@ Parameters:
     Type: String
     Default: /products
 
+  ImageUrl:
+    Type: String
+    Description: The full ECR image URI provided by the CI/CD pipeline
+
 Resources:
   Service:
     Type: AWS::ECS::Service
@@ -45,7 +49,7 @@ Resources:
       ContainerDefinitions:
         - Name: product-service
           Essential: true
-          Image: 275396840892.dkr.ecr.us-east-1.amazonaws.com/ecs-refarch-cloudformation/product-service:1.0.0
+          Image: !Ref ImageUrl
           Memory: 128
           PortMappings:
             - ContainerPort: 8001

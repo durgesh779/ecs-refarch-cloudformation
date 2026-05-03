@@ -9,7 +9,7 @@ all: run
 # $ make publish version=1.0.0
 
 name = ecs-refarch-cloudformation/product-service
-registry = 275396840892.dkr.ecr.us-east-1.amazonaws.com
+registry ?= <your-account-id>.dkr.ecr.<region>.amazonaws.com
 version ?= latest
 
 binary:

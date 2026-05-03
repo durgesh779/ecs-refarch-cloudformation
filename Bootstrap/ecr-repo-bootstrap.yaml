@@ -1,0 +1,26 @@
+Description: >
+    CloudFormation template to create ECR repositories for the product and website services.
+    This template is intended to be deployed once, and the resulting repository URLs should be used in the service templates.
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  RepositoryNamePrefix:
+    Type: String
+    Description: The name of the ECR repository to create (e.g. "product-service" or "website-service")
+    Default: "ecs-refarch-cloudformation"
+
+Resources:
+  ProductServiceRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${RepositoryNamePrefix}/product-service"
+      ImageScanningConfiguration:
+        ScanOnPush: true
+
+  WebsiteServiceRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${RepositoryNamePrefix}/website-service"
+      ImageScanningConfiguration:
+        ScanOnPush: true
