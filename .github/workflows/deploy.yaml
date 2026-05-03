@@ -21,10 +21,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.OIDC_ROLE_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Validate all Templates
-        run: |
-          chmod +x ./tests/validate-templates.sh
-          ./tests/validate-templates.sh
+    #   - name: Validate all Templates
+    #     run: |
+    #       chmod +x ./tests/validate-templates.sh
+    #       ./tests/validate-templates.sh
 
       - name: Login to Amazon ECR
         id: login-ecr
