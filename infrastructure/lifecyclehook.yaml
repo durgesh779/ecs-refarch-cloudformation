@@ -141,5 +141,5 @@ Resources:
       Role: !GetAtt
         - LambdaExecutionRole
         - Arn
-      Runtime: python3.6
-      Timeout: 10
+      Runtime: python3.11
+      Timeout: 30
