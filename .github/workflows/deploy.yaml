@@ -70,7 +70,7 @@ jobs:
           capabilities: CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND
           parameter-overrides: >
             EnvironmentName=dev,
-            InstanceType=t3.medium,
+            InstanceType=t3.micro,
             ClusterSize=2,
             TemplateBucket=${{ secrets.TEMPLATE_BUCKET }},
             ProductServiceImageUrl=${{ steps.login-ecr.outputs.registry }}/ecs-refarch-cloudformation/product-service:${{ github.sha }},
