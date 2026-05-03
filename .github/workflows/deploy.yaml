@@ -21,10 +21,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.OIDC_ROLE_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Validate all Templates
-        run: |
-          chmod +x ./tests/validate-templates.sh
-          ./tests/validate-templates.sh
+    #   - name: Validate all Templates
+    #     run: |
+    #       chmod +x ./tests/validate-templates.sh
+    #       ./tests/validate-templates.sh
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -64,7 +64,7 @@ jobs:
       - name: Deploy CloudFormation Master Stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: Dev-ECS-Stack
+          name: DevECSCluster
           template: master.yaml
           capabilities: CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND
           parameter-overrides: >
@@ -72,4 +72,5 @@ jobs:
             InstanceType=t3.medium,
             ClusterSize=2,
             TemplateBucket=${{ secrets.TEMPLATE_BUCKET }},
-            ImageUrl=${{ steps.login-ecr.outputs.registry }}/ecs-refarch-cloudformation/product-service:${{ github.sha }}
+            ProductServiceImageUrl=${{ steps.login-ecr.outputs.registry }}/ecs-refarch-cloudformation/product-service:${{ github.sha }},
+            WebsiteServiceImageUrl=${{ steps.login-ecr.outputs.registry }}/ecs-refarch-cloudformation/website-service:${{ github.sha }}

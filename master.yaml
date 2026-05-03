@@ -30,10 +30,12 @@ Parameters:
     Type: String
     Description: S3 Bucket where CloudFormation templates are stored
 
-  ImageUrl:
+  ProductServiceImageUrl:
     Type: String
     Description: The full ECR image URI provided by the CI/CD pipeline
-
+  WebsiteServiceImageUrl:
+    Type: String
+    Description: The full ECR image URI provided by the CI/CD pipeline for the website service (if different from product service)
 Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
@@ -71,7 +73,7 @@ Resources:
       TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/infrastructure/ecs-cluster.yaml"
       Parameters:
         EnvironmentName: !Ref AWS::StackName
-        InstanceType: t2.large
+        InstanceType: t3.medium
         ClusterSize: 4
         VPC: !GetAtt VPC.Outputs.VPC
         SecurityGroup: !GetAtt SecurityGroups.Outputs.ECSHostSecurityGroup
@@ -87,7 +89,7 @@ Resources:
         DesiredCount: 2
         Listener: !GetAtt ALB.Outputs.Listener
         Path: /products
-        ImageUrl: !Ref ImageUrl
+        ImageUrl: !Ref ProductServiceImageUrl
 
   WebsiteService:
     Type: AWS::CloudFormation::Stack
@@ -95,14 +97,14 @@ Resources:
       TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/services/website-service/service.yaml"
       Parameters:
         VPC: !GetAtt VPC.Outputs.VPC
-        Cluster: !GetAtt ECS.Outputs.Cluster
+        Cluster: !GetAtt ECS.Outputs.Cluster  
         DesiredCount: 2
         ProductServiceUrl:
           !Join ["/", [!GetAtt ALB.Outputs.LoadBalancerUrl, "products"]]
         Listener: !GetAtt ALB.Outputs.Listener
         Path: /
         ECSServiceAutoScalingRoleARN: !GetAtt ECS.Outputs.ECSServiceAutoScalingRole
-        ImageUrl: !Ref ImageUrl
+        ImageUrl: !Ref WebsiteServiceImageUrl
 
   LifecycleHook:
     Type: AWS::CloudFormation::Stack
