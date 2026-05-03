@@ -3,6 +3,7 @@ name: Deploy ECS Nested Stack
 on:
   push:
     branches: [ feature/* ]
+  workflow_dispatch:
 
 permissions:
   id-token: write # Required for OIDC
