@@ -1,25 +1,14 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Bootstrap Stack: OIDC Identity Provider and IAM Role for GitHub Actions'
-
 Parameters:
   GitHubOrg:
     Type: String
-    Description: Your GitHub Organization or Username
   GitHubRepo:
     Type: String
-    Description: The name of your GitHub Repository
+  # Add this parameter to point to the existing provider
+  OidcProviderArn:
+    Type: String
+    Description: ARN of the existing GitHub OIDC Provider
 
 Resources:
-  # The OIDC Provider is created once per account
-  GithubOidc:
-    Type: AWS::IAM::OIDCProvider
-    Properties:
-      Url: https://token.actions.githubusercontent.com
-      ClientIdList: 
-        - sts.amazonaws.com
-      ThumbprintList: 
-        - 1b51101111122223333444455556666777788889 # Standard GitHub OIDC Thumbprint
-
   GithubActionsRole:
     Type: AWS::IAM::Role
     Properties:
@@ -29,13 +18,12 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Federated: !Ref GithubOidc
+              # Reference the existing ARN instead of creating a new resource
+              Federated: !Ref OidcProviderArn
             Action: "sts:AssumeRoleWithWebIdentity"
             Condition:
               StringLike:
                 "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubOrg}/${GitHubRepo}:*"
-      
-      # Broad permissions for Dev Environment
       Policies:
         - PolicyName: GitHubActionsDevAccess
           PolicyDocument:
@@ -50,14 +38,6 @@ Resources:
                   - "ec2:*"
                   - "iam:PassRole"
                   - "iam:GetRole"
-                  - "iam:CreateRole"
-                  - "iam:DeleteRole"
                   - "iam:PutRolePolicy"
-                  - "iam:DeleteRolePolicy"
                   - "lambda:*"
                 Resource: "*"
-
-Outputs:
-  RoleArn:
-    Value: !GetAtt GithubActionsRole.Arn
-    Description: The ARN of the role for GitHub Actions to assume.
