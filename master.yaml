@@ -73,7 +73,7 @@ Resources:
       TemplateURL: !Sub "https://${TemplateBucket}.s3.amazonaws.com/infrastructure/ecs-cluster.yaml"
       Parameters:
         EnvironmentName: !Ref AWS::StackName
-        InstanceType: t3.medium
+        InstanceType: t3.micro
         ClusterSize: 4
         VPC: !GetAtt VPC.Outputs.VPC
         SecurityGroup: !GetAtt SecurityGroups.Outputs.ECSHostSecurityGroup
