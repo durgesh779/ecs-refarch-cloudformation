@@ -5,11 +5,11 @@ name = ecs-refarch-cloudformation/website-service
 registry ?= <your-account-id>.dkr.ecr.<region>.amazonaws.com
 version ?= latest
 
-# 1. FIXED: Removed empty GOPATH mount and upgraded to Go 1.25
+# 1. FIXED: Removed empty GOPATH mount and upgraded to Go 1.26 for better module support and security patches
 # 2. FIXED: Added 'go mod tidy' to handle modern dependencies automatically
 binary:
 	$(call blue, "Building Linux binary ready for containerisation...")
-	docker run --rm -v "$(CURDIR)":/app -w /app golang:1.25 sh -c 'go mod tidy && CGO_ENABLED=0 go build -o app main.go'
+	docker run --rm -v "$(CURDIR)":/app -w /app golang:1.26 sh -c 'go mod tidy && CGO_ENABLED=0 go build -o app main.go'
 
 image: binary
 	$(call blue, "Building docker image...")
