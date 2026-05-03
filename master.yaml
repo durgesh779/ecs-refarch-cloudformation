@@ -11,10 +11,21 @@ Description: >
   Finally, it deploys a pair of example ECS services from containers published in 
   Amazon EC2 Container Registry (Amazon ECR).
 
-  Last Modified: 22nd September 2016
-  Author: Paul Maddox <pmaddox@amazon.com>
-
 Parameters:
+  EnvironmentName:
+    Type: String
+    Description: An environment name to be used as a prefix for resource names (e.g. "dev", "staging", "prod")
+
+  ClusterSize:
+    Type: Number
+    Description: The number of ECS hosts to deploy in the cluster
+    Default: 4
+
+  InstanceType:
+    Type: String
+    Description: The EC2 instance type to use for the ECS hosts
+    Default: t3.micro
+
   TemplateBucket:
     Type: String
     Description: S3 Bucket where CloudFormation templates are stored

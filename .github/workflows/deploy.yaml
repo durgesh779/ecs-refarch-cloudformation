@@ -21,17 +21,28 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.OIDC_ROLE_NAME }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-    #   - name: Validate all Templates
-    #     run: |
-    #       chmod +x ./tests/validate-templates.sh
-    #       ./tests/validate-templates.sh
+      - name: Validate all Templates
+        run: |
+          chmod +x ./tests/validate-templates.sh
+          ./tests/validate-templates.sh
 
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push with Makefile
+      - name: Build and Push Product Service Image to ECR
         working-directory: ./services/product-service/src
+        run: |
+          # 1. Build the binary and docker image
+          # We pass the Git SHA as the version to avoid using 'latest'
+          make image version=${{ github.sha }}
+
+          # 2. Publish to ECR
+          # We override the registry if it differs from the Makefile hardcoded value
+          make publish version=${{ github.sha }} registry=${{ steps.login-ecr.outputs.registry }}
+
+      - name: Build and Push Website Service Image to ECR
+        working-directory: ./services/website-service/src
         run: |
           # 1. Build the binary and docker image
           # We pass the Git SHA as the version to avoid using 'latest'
@@ -53,7 +64,7 @@ jobs:
       - name: Deploy CloudFormation Master Stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: Production-ECS-Stack
+          name: Dev-ECS-Stack
           template: master.yaml
           capabilities: CAPABILITY_NAMED_IAM, CAPABILITY_AUTO_EXPAND
           parameter-overrides: >
