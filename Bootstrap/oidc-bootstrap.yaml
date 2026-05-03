@@ -47,4 +47,5 @@ Resources:
                   - "logs:*"
                   - "sns:*"
                   - "elasticloadbalancing:*"
+                  - "application-autoscaling:*"
                 Resource: "*"
