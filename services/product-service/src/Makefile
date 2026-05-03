@@ -34,7 +34,7 @@ clean:
 	@rm -f app 
 
 define blue
-	@tput setaf 6
+	@if [ -t 1 ]; then tput setaf 6; fi
 	@echo $1
-	@tput sgr0
+	@if [ -t 1 ]; then tput sgr0; fi
 endef
