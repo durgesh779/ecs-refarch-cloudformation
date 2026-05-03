@@ -36,6 +36,7 @@ Resources:
                   - "ecr:*"
                   - "ecs:*"
                   - "ec2:*"
+                  - "iam:*"
                   - "iam:PassRole"
                   - "iam:GetRole"
                   - "iam:PutRolePolicy"
