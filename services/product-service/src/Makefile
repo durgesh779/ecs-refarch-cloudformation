@@ -7,8 +7,8 @@ version ?= latest
 # 1. Separated the binary and image targets
 binary:
 	$(call blue, "Building Linux binary...")
-	docker run --rm -v "$(CURDIR)":/app -w /app golang:1.21 sh -c 'CGO_ENABLED=0 go build -o app main.go'
-	
+	docker run --rm -v "$(CURDIR)":/app -w /app golang:1.25 sh -c 'CGO_ENABLED=0 go build -o app main.go'
+
 # 2. Re-added the missing 'image' target
 image: binary
 	$(call blue, "Building docker image...")
