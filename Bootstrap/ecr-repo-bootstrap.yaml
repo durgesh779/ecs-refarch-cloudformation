@@ -7,7 +7,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   RepositoryNamePrefix:
     Type: String
-    Description: The name of the ECR repository to create (e.g. "product-service" or "website-service")
+    Description: The name of the ECR repository to create
     Default: "ecs-refarch-cloudformation"
 
 Resources:
